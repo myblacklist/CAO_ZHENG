@@ -1,0 +1,1 @@
+建立一个名为cao_zheng的database，把sql文件夹中的三个sql文件导入到其中。运行app.js打开127.0.0.1:3000/login

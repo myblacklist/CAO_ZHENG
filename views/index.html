@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+		<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="css/index.css" />
+		<script src="/js/index.js"></script>
+	</head>
+
+	<body>
+		<div class="container-fluid">
+			<div id="cover" onclick="hide_all(<%=list_flag %>)"></div>
+			<div id="row1" class="row">
+				<div id="nav" class="col-lg-2" style="border:0px solid red;background-color:#204D74;">
+					<div style="background: #204D74;">
+						<span></span>
+						<span id="span0" class="glyphicon glyphicon-user" style="color:#F5F5F5;">&nbsp;<%=userName %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+						<a href="/logout" style="color: #FFFFFF;">退出
+							<a>
+					</div>
+					<div style="background: #204D74;">
+						<span id="span1" class="glyphicon glyphicon-th-list visible-xs-block" style="font-size:20px;margin-left:95%;" onclick="container()"></span>
+					</div>
+					<nav id="nav0" style="list-style-type:none ; background-color: #204D74; width: 113%; margin-left: -8%;">
+						<li style="padding-top: 5px;">
+							<form method="post" action="search?flag=0" onsubmit="check_search()">
+								<input type="text" style="width: 70%; float: left;" class="form-control" id="search" name="search" placeholder="Search" />
+								<button type="submit" class="btn btn-primary">搜索</button>
+							</form>
+						</li>
+						<li>
+							<span class="glyphicon glyphicon-asterisk"></span>
+							<a href="/index?list=1&flag=0">
+								<p>我的一天</p>
+							</a>
+						</li>
+
+						<li>
+							<span class="glyphicon glyphicon-time"></span>
+							<a href="/index?list=2&flag=0">
+								<p>Todo</p>
+							</a>
+						</li>
+
+						<li>
+							<span class="glyphicon glyphicon-trash"></span>
+							<a href="/index?list=3&flag=0">
+								<p>已完成</p>
+							</a>
+						</li>
+
+						<%for(var i=0;i<lists.length;i++){ %>
+						<li style="padding-right: 8px;">
+							<span class="glyphicon glyphicon-list"></span>
+							<a href="/index?list=<%=lists[i].id %>&flag=0">
+								<p>
+									<%=lists[i].title %>
+								</p>
+							</a>
+							<button type="button" class="close" onclick="deleteList(<%=lists[i].id %>)" aria-label="Close">
+								<span aria-hidden="true" style="color: white;">&times;</span>
+							</button>
+						</li>
+						<%} %>
+
+						<li onclick="newList()"><span class="glyphicon glyphicon-plus"></span>
+							<p>新建清单</p>
+						</li>
+
+						<li id="li_list" style="display: none;">
+							<form class="form-inline" onsubmit="return check_list()" method="post" action="/newList">
+								<div class="form-group">
+									<input type="text" class="form-control" id="newList" name="newList" placeholder="列表名" />
+								</div>
+								<button type="submit" class="btn btn-primary" >提交</button>
+							</form>
+						</li>
+
+					</nav>
+				</div>
+				<div class="col-lg-10" style="padding: 0px; height: 900px;border:0px solid red; overflow: auto;">
+					<div class="right_head">
+						WEB前端高级技术大作业
+					</div>
+					<table class="table table-condensed">
+						<tr>
+							<%
+								var url = "/index?list="+list_flag+"&flag="+(1-order_flag);
+								if(list_flag == -1) url = "/search?flag="+(1-order_flag);
+								
+							%>
+							<td width="20%">排序 | <a href="<%=url %>"><span style="color: orange;"><%=order_flag==0?"紧急":"时间" %></span></a></td>
+							<td width="20%">时间</td>
+							<td width="20%">紧急度</td>
+							<td width="20%">状态</td>
+							<td width="20%">操作</td>
+						</tr>
+						<%if(things.length == 0){%>
+						<tr>
+							<td colspan="5" style="color: orange;">没有任何记录</td>
+						</tr>
+						<%} %>
+						<%for(var i=0;i<things.length;i++){ %>
+						<tr>
+							<td>
+								<%=things[i].title %>
+							</td>
+							<td>
+								<%=things[i].time %>
+							</td>
+							<td style="color: <%=things[i].urgent==1?'greenyellow':things[i].urgent==2?'yellow':'red' %>;">
+								<%=things[i].urgent==1?"普通":things[i].urgent==2?"重要":"紧急" %>
+							</td>
+							<td>
+								<%=things[i].isdelete==0?"进行中":"已完成" %>
+							</td>
+							<td>
+								<%if(list_flag != 3){%>
+								<a href="#" onclick="update('<%=things[i].title %>','<%=things[i].time %>',<%=things[i].urgent %>,<%=things[i].id %>,<%=list_flag %>)"><span class="upd_a">修改</span> </a>&nbsp;
+								<a href="/deleteThing?id=<%=things[i].id %>&list=<%=list_flag %>"><span class="del_a">完成</span> </a>
+								<%}else{ %>
+									<a href="/removeThing?id=<%=things[i].id %>"><span class="del_a">清除</span> </a>
+								<%} %>
+							</td>
+						</tr>
+						<%}if(list_flag != -1){ %>
+						<tr>
+							<td colspan="5" style="text-align: left; padding-left: 6%;">
+								<button class="btn btn-primary" onclick="addThing()"><span class="glyphicon glyphicon-plus"></span>添加记录</button>
+							</td>
+						</tr>
+						<%} %>
+					</table>
+					<div class="thing" id="thing">
+						<form method="post" id="myform" action="/addThing?list=<%=list_flag %>" onsubmit="return TimeCheck()">
+							<span id="tip" style="color: red;"></span>
+							<div class="form-group">
+								<div>标题</div>
+								<input type="text" class="form-control" id="title" name="title" placeholder="标题">
+							</div>
+							<div class="form-group">
+								<div>日期</div>
+								<input type="text" class="form-control date" id="year" name="year" placeholder="year">
+								<div class="sparator">-</div>
+								<input type="text" class="form-control date" id="month" name="month" placeholder="month">
+								<div class="sparator">-</div>
+								<input type="text" class="form-control date" id="day" name="day" placeholder="day">
+								<div class="clear"></div>
+							</div>
+							<div class="form-group">
+								<div>紧急程度</div>
+								<label class="radio-inline">
+								  <input type="radio" name="urgent" id="urg1" value="1" checked="checked"> 普通
+								</label>
+								<label class="radio-inline">
+								  <input type="radio" name="urgent" id="urg2" value="2"> 重要
+								</label>
+								<label class="radio-inline">
+								  <input type="radio" name="urgent" id="urg3" value="3"> 紧急
+								</label>
+							</div>
+							<button type="submit" class="btn btn-default">Submit</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div style="clear:both"></div>
+	</body>
+</html>
